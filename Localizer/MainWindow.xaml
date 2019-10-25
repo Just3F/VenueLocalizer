@@ -10,12 +10,12 @@
 
         <Button Content="Select Folder" Width="85" Height="18" Click="SelectFolder_Click" Margin="0,0,10,62" Canvas.Left="699" Cursor="Hand" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
         <TextBox Name="filePathTextBox" Margin="10,0,100,62" Text="File Path" TextWrapping="Wrap" VerticalAlignment="Bottom"/>
-        <RichTextBox Name="mainTextContent" Margin="10,10,10,85" VerticalScrollBarVisibility="Auto">
-            <FlowDocument>
-                <Paragraph>
-                    <Run Text=""/>
-                </Paragraph>
-            </FlowDocument>
+        <RichTextBox Name="logRichText" Margin="10,10,10,85" VerticalScrollBarVisibility="Auto">
+            <RichTextBox.Resources>
+                <Style TargetType="{x:Type Paragraph}">
+                    <Setter Property="Margin" Value="0"/>
+                </Style>
+            </RichTextBox.Resources>
         </RichTextBox>
         <Button Content="Select XLS" Width="85" Height="18" Click="Button_Click" Margin="0,0,10,39" HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="Hand"/>
         <TextBox Name="xlsPathTextBox" Margin="10,0,100,39" Text="XLS Path" TextWrapping="Wrap" VerticalAlignment="Bottom"/>
