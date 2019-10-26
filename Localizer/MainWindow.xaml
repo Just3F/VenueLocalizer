@@ -3,25 +3,25 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Localizer"
         mc:Ignorable="d"
-        Title="Venue Translator" Height="450" Width="600" MinWidth="600" MinHeight="450">
+        Title="Venue Translator" Height="550" Width="600" MinWidth="600" MinHeight="550">
     <Grid>
 
-        <Button Content="Select Folder" Width="85" Height="18" Click="SelectFolder_Click" Margin="0,0,10,62" Canvas.Left="699" Cursor="Hand" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
-        <TextBox Name="filePathTextBox" Margin="10,0,100,62" Text="File Path" TextWrapping="Wrap" VerticalAlignment="Bottom"/>
-        <RichTextBox Name="logRichText" Margin="10,10,10,85" VerticalScrollBarVisibility="Auto">
+        <Button Content="Select Folder" Width="85" Height="18" Click="SelectFolder_Click" Margin="0,0,9,87" Canvas.Left="699" Cursor="Hand" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+        <TextBox Name="filePathTextBox" Margin="11,0,99,87" Text="File Path" TextWrapping="Wrap" VerticalAlignment="Bottom"/>
+        <RichTextBox Name="logRichText" Margin="10,10,10,110" VerticalScrollBarVisibility="Auto">
             <RichTextBox.Resources>
                 <Style TargetType="{x:Type Paragraph}">
                     <Setter Property="Margin" Value="0"/>
                 </Style>
             </RichTextBox.Resources>
         </RichTextBox>
-        <Button Content="Select XLS" Width="85" Height="18" Click="Button_Click" Margin="0,0,10,39" HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="Hand"/>
-        <TextBox Name="xlsPathTextBox" Margin="10,0,100,39" Text="XLS Path" TextWrapping="Wrap" VerticalAlignment="Bottom"/>
-        <Button Content="Add new Key" Width="85" Height="21" Click="AddNewKey_Click" Margin="0,0,304,13" HorizontalAlignment="Right" VerticalAlignment="Bottom" Background="#FFC4CCFF" Cursor="Hand"/>
-        <TextBox Name="newKeyNameTextBox" Margin="10,0,394,13" Text="New Key" TextWrapping="Wrap" VerticalAlignment="Bottom" BorderBrush="#FF8EA7F1" Height="21"/>
-        <Button Content="Load Tranlsates from XLS" Width="142" Height="21" Click="LoadTranlsatesFromXLS_Click" Margin="0,0,157,13" HorizontalAlignment="Right" VerticalAlignment="Bottom" Background="#FFC4EFFF" Cursor="Hand"/>
+        <Button Content="Select XLS" Width="85" Height="18" Click="Button_Click" Margin="0,0,9,64" HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="Hand"/>
+        <TextBox Name="xlsPathTextBox" Margin="11,0,99,64" Text="XLS Path" TextWrapping="Wrap" VerticalAlignment="Bottom"/>
+        <Button Content="Add new Key" Width="85" Height="47" Click="AddNewKey_Click" Margin="0,0,303,12" HorizontalAlignment="Right" VerticalAlignment="Bottom" Background="#FFC4CCFF" Cursor="Hand"/>
+        <TextBox Name="newKeyNameTextBox" Margin="11,0,393,38" Text="New Key" TextWrapping="Wrap" VerticalAlignment="Bottom" BorderBrush="#FF8EA7F1" Height="21"/>
+        <Button Content="Load Tranlsates from XLS" Width="142" Height="21" Click="LoadTranlsatesFromXLS_Click" Margin="0,0,156,38" HorizontalAlignment="Right" VerticalAlignment="Bottom" Background="#FFC4EFFF" Cursor="Hand"/>
+        <TextBox Name="defaultNewKeyValue" Margin="11,0,393,12" Text="Default New Key Value" TextWrapping="Wrap" VerticalAlignment="Bottom" BorderBrush="#FF8EA7F1" Height="21"/>
 
     </Grid>
 </Window>

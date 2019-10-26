@@ -1,17 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Win32;
 using System.IO;
+using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
+using Newtonsoft.Json;
 
 namespace Localizer
 {
     public partial class MainWindow : Window
     {
-        public readonly ResourceModel[] LanguageResources = new ResourceModel[]
-        {
+        public ResourceModel[] LanguageResources = {
             new ResourceModel { FileName = "de" },
             new ResourceModel { FileName = "en" },
             new ResourceModel { FileName = "es" },
@@ -24,6 +26,10 @@ namespace Localizer
             new ResourceModel { FileName = "zh-hans" }
         };
 
+        public bool IsAllTranslatesLoaded = false;
+        public bool IsXlsLoaded = false;
+        public string ExcelFileContent = "";
+
         public MainWindow()
         {
             InitializeComponent();
@@ -31,14 +37,28 @@ namespace Localizer
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.DefaultExt = ".txt";
-            openFileDialog.Filter = "Text Document (.txt)|*.txt";
+            OpenFileDialog openFileDialog = new OpenFileDialog { Filter = "Excel Files|*.xls;*.xlsx;*.xlsm" };
+
             if (openFileDialog.ShowDialog() == true)
             {
                 string fileName = openFileDialog.FileName;
-                filePathTextBox.Text = fileName;
-                var text = File.ReadAllText(fileName);
+                xlsPathTextBox.Text = fileName;
+                logRichText.AppendText("Excel File", "Black");
+                try
+                {
+                    ExcelFileContent = File.ReadAllText(fileName);
+                }
+                catch (FileNotFoundException)
+                {
+                    logRichText.AppendText(" : NOT FOUND", "Red");
+                    xlsPathTextBox.Background = Brushes.IndianRed;
+                }
+
+                logRichText.AppendText(" : OK", "Green");
+                xlsPathTextBox.Background = Brushes.LightGreen;
+                IsXlsLoaded = true;
+
+                ConsoleNewLine();
                 //logRichText.Document.Blocks.Clear();
                 //logRichText.Document.Blocks.Add(new Paragraph(new Run(text)));
             }
@@ -47,6 +67,7 @@ namespace Localizer
         private void AddNewKey_Click(object sender, RoutedEventArgs e)
         {
             var newKeyValue = newKeyNameTextBox.Text;
+            var defaultValue = defaultNewKeyValue.Text;
             if (string.IsNullOrWhiteSpace(newKeyValue))
             {
                 _ = MessageBox.Show("Key Name cannot be empty.", "Warning", MessageBoxButton.OK);
@@ -55,9 +76,23 @@ namespace Localizer
             {
                 _ = MessageBox.Show("Please select xls file path and folder with translates.", "Warning", MessageBoxButton.OK);
             }
+            else if (!IsXlsLoaded || !IsAllTranslatesLoaded)
+            {
+                _ = MessageBox.Show("Excel file or translate files was not loaded!", "Warning", MessageBoxButton.OK);
+            }
             else
             {
-                //TODO add all keys to files
+                foreach (var languageResource in LanguageResources)
+                {
+                    languageResource.ResourceParsedText.Add(newKeyValue, defaultValue);
+                    var serializedObject = JsonConvert.SerializeObject(languageResource.ResourceParsedText);
+                    File.WriteAllText(languageResource.FullPath, serializedObject);
+
+                    logRichText.AppendText($"New key for {languageResource.FileName}", "Black");
+                    logRichText.AppendText(" : OK", "Green");
+                    ConsoleNewLine();
+                }
+
             }
         }
 
@@ -87,24 +122,41 @@ namespace Localizer
 
                     try
                     {
-                        var textResource = File.ReadAllText($@"{folderPath}\{languageResource.FileName}.json");
+                        var fullPath = $@"{folderPath}\{languageResource.FileName}.json";
+                        var resText = File.ReadAllText(fullPath);
+                        languageResource.FullPath = fullPath;
+                        languageResource.ResourceText = resText;
+                        languageResource.ResourceParsedText =
+                            JsonConvert.DeserializeObject<Dictionary<string, string>>(resText);
+
                         logRichText.AppendText(": OK", "Green");
 
                     }
-                    catch (FileNotFoundException ex)
+                    catch (FileNotFoundException)
                     {
                         isSmthMissed = true;
                         logRichText.AppendText(" : NOT FOUND", "Red");
+                    }
+                    catch (Exception ex)
+                    {
+                        isSmthMissed = true;
+                        logRichText.AppendText(ex.Message, "Red");
                     }
 
                     logRichText.AppendText(Environment.NewLine);
                 }
 
-                filePathTextBox.IsReadOnly = !isSmthMissed;
+                filePathTextBox.IsReadOnly = IsAllTranslatesLoaded = !isSmthMissed;
 
-                logRichText.AppendText("---------------------------------------------", "Black");
-                logRichText.AppendText(Environment.NewLine);
+                ConsoleNewLine();
+                filePathTextBox.Background = IsAllTranslatesLoaded ? Brushes.LightGreen : Brushes.PaleVioletRed;
             }
+        }
+
+        private void ConsoleNewLine()
+        {
+            logRichText.AppendText("---------------------------------------------", "Black");
+            logRichText.AppendText(Environment.NewLine);
         }
     }
 
@@ -126,5 +178,8 @@ namespace Localizer
     public class ResourceModel
     {
         public string FileName { get; set; }
+        public string ResourceText { get; set; }
+        public string FullPath { get; set; }
+        public Dictionary<string, string> ResourceParsedText { get; set; }
     }
 }
