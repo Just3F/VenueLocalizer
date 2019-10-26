@@ -16,7 +16,7 @@
                 </Style>
             </RichTextBox.Resources>
         </RichTextBox>
-        <Button Content="Select XLS" Width="85" Height="18" Click="Button_Click" Margin="0,0,9,64" HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="Hand"/>
+        <Button Content="Select XLS" Width="85" Height="18" Click="ExcelFileSelect_Click" Margin="0,0,9,64" HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="Hand"/>
         <TextBox Name="xlsPathTextBox" Margin="11,0,99,64" Text="XLS Path" TextWrapping="Wrap" VerticalAlignment="Bottom"/>
         <Button Content="Add new Key" Width="85" Height="47" Click="AddNewKey_Click" Margin="0,0,303,12" HorizontalAlignment="Right" VerticalAlignment="Bottom" Background="#FFC4CCFF" Cursor="Hand"/>
         <TextBox Name="newKeyNameTextBox" Margin="11,0,393,38" Text="New Key" TextWrapping="Wrap" VerticalAlignment="Bottom" BorderBrush="#FF8EA7F1" Height="21"/>

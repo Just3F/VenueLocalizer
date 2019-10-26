@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using Microsoft.Win32;
 using System.IO;
-using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
 using Newtonsoft.Json;
+using ExcelDataReader;
 
 namespace Localizer
 {
@@ -32,12 +32,13 @@ namespace Localizer
 
         public MainWindow()
         {
+            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
             InitializeComponent();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void ExcelFileSelect_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog { Filter = "Excel Files|*.xls;*.xlsx;*.xlsm" };
+            var openFileDialog = new OpenFileDialog { Filter = "Excel Files|*.xls;*.xlsx;*.xlsm" };
 
             if (openFileDialog.ShowDialog() == true)
             {
@@ -46,7 +47,19 @@ namespace Localizer
                 logRichText.AppendText("Excel File", "Black");
                 try
                 {
-                    ExcelFileContent = File.ReadAllText(fileName);
+                    //ExcelFileContent = File.ReadAllText(fileName);
+                    using var stream = File.Open(fileName, FileMode.Open, FileAccess.Read);
+                    using var reader = ExcelReaderFactory.CreateReader(stream);
+
+                    do
+                    {
+                        while (reader.Read())
+                        { }
+                    } while (reader.NextResult());
+
+                    var result = reader.AsDataSet();
+
+                    // The result of each spreadsheet is in result.Tables
                 }
                 catch (FileNotFoundException)
                 {
@@ -85,7 +98,7 @@ namespace Localizer
                 foreach (var languageResource in LanguageResources)
                 {
                     languageResource.ResourceParsedText.Add(newKeyValue, defaultValue);
-                    var serializedObject = JsonConvert.SerializeObject(languageResource.ResourceParsedText);
+                    var serializedObject = JsonConvert.SerializeObject(languageResource.ResourceParsedText, Formatting.Indented);
                     File.WriteAllText(languageResource.FullPath, serializedObject);
 
                     logRichText.AppendText($"New key for {languageResource.FileName}", "Black");
