@@ -1,34 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using Microsoft.Win32;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
+using Aspose.Cells;
 using Newtonsoft.Json;
-using ExcelDataReader;
 
 namespace Localizer
 {
     public partial class MainWindow : Window
     {
         public ResourceModel[] LanguageResources = {
-            new ResourceModel { FileName = "de" },
-            new ResourceModel { FileName = "en" },
-            new ResourceModel { FileName = "es" },
-            new ResourceModel { FileName = "fr" },
-            new ResourceModel { FileName = "it" },
-            new ResourceModel { FileName = "ja" },
-            new ResourceModel { FileName = "ko" },
-            new ResourceModel { FileName = "pt" },
-            new ResourceModel { FileName = "ru" },
-            new ResourceModel { FileName = "zh-hans" }
+            new ResourceModel { FileName = "de", ColumnExcelName = "German"},
+            new ResourceModel { FileName = "en", ColumnExcelName = "English"},
+            new ResourceModel { FileName = "es", ColumnExcelName = "Spanish"},
+            new ResourceModel { FileName = "fr", ColumnExcelName = "French"},
+            new ResourceModel { FileName = "it", ColumnExcelName = "Italian"},
+            new ResourceModel { FileName = "ja", ColumnExcelName = "Japanese"},
+            new ResourceModel { FileName = "ko", ColumnExcelName = "Korean"},
+            new ResourceModel { FileName = "pt", ColumnExcelName = "Portuguese"},
+            new ResourceModel { FileName = "ru", ColumnExcelName = "Russian"},
+            new ResourceModel { FileName = "zh-hans", ColumnExcelName = "Chinese (Simplified)"}
         };
 
         public bool IsAllTranslatesLoaded = false;
         public bool IsXlsLoaded = false;
-        public string ExcelFileContent = "";
 
         public MainWindow()
         {
@@ -38,6 +38,7 @@ namespace Localizer
 
         private void ExcelFileSelect_Click(object sender, RoutedEventArgs e)
         {
+
             var openFileDialog = new OpenFileDialog { Filter = "Excel Files|*.xls;*.xlsx;*.xlsm" };
 
             if (openFileDialog.ShowDialog() == true)
@@ -47,19 +48,22 @@ namespace Localizer
                 logRichText.AppendText("Excel File", "Black");
                 try
                 {
-                    //ExcelFileContent = File.ReadAllText(fileName);
-                    using var stream = File.Open(fileName, FileMode.Open, FileAccess.Read);
-                    using var reader = ExcelReaderFactory.CreateReader(stream);
+                    FileStream fstream = new FileStream(fileName, FileMode.Open);
 
-                    do
-                    {
-                        while (reader.Read())
-                        { }
-                    } while (reader.NextResult());
+                    // Instantiate a Workbook object that represents the existing Excel file
+                    Workbook workbook = new Workbook(fstream);
 
-                    var result = reader.AsDataSet();
+                    // Get the reference of "A1" cell from the cells collection of a worksheet
+                    Cell cell = workbook.Worksheets[0].Cells["A1"];
 
-                    // The result of each spreadsheet is in result.Tables
+                    // Put the "Hello World!" text into the "A1" cell
+                    cell.PutValue("Hello World!");
+                    fstream.Close();
+
+                    // Save the Excel file
+                    workbook.Save(fileName);
+
+                    // Closing the file stream to free all resources
                 }
                 catch (FileNotFoundException)
                 {
@@ -101,6 +105,8 @@ namespace Localizer
                     var serializedObject = JsonConvert.SerializeObject(languageResource.ResourceParsedText, Formatting.Indented);
                     File.WriteAllText(languageResource.FullPath, serializedObject);
 
+
+
                     logRichText.AppendText($"New key for {languageResource.FileName}", "Black");
                     logRichText.AppendText(" : OK", "Green");
                     ConsoleNewLine();
@@ -111,7 +117,17 @@ namespace Localizer
 
         private void LoadTranlsatesFromXLS_Click(object sender, RoutedEventArgs e)
         {
-            //TODO
+            //var test = ExcelFileContent.AsDataSet();
+            //var mySheet = test.Tables[0];
+            //var mySheetHeader = mySheet.Rows[0];
+            //foreach (var languageResource in LanguageResources)
+            //{
+            //    DataRow workRow = mySheet.NewRow();
+            //    workRow[0] = "asdasdasdas1123";
+            //    workRow[4] = "xzcs2131231newKeyValuesdaasdasdasdas123";
+            //    mySheet.Rows.Add(workRow);
+            //    ExcelFileContent.Close();
+            //}
         }
 
         private void SelectFolder_Click(object sender, RoutedEventArgs e)
@@ -191,6 +207,7 @@ namespace Localizer
     public class ResourceModel
     {
         public string FileName { get; set; }
+        public string ColumnExcelName { get; set; }
         public string ResourceText { get; set; }
         public string FullPath { get; set; }
         public Dictionary<string, string> ResourceParsedText { get; set; }
