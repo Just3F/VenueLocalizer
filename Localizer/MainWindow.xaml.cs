@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using Microsoft.Win32;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -29,6 +29,8 @@ namespace Localizer
 
         public bool IsAllTranslatesLoaded = false;
         public bool IsXlsLoaded = false;
+        public Workbook workbook;
+        public int NameExcelIndex;
 
         public MainWindow()
         {
@@ -50,34 +52,51 @@ namespace Localizer
                 {
                     FileStream fstream = new FileStream(fileName, FileMode.Open);
 
-                    // Instantiate a Workbook object that represents the existing Excel file
-                    Workbook workbook = new Workbook(fstream);
-
-                    // Get the reference of "A1" cell from the cells collection of a worksheet
-                    Cell cell = workbook.Worksheets[0].Cells["A1"];
-
-                    // Put the "Hello World!" text into the "A1" cell
-                    cell.PutValue("Hello World!");
+                    workbook = new Workbook(fstream);
                     fstream.Close();
 
-                    // Save the Excel file
-                    workbook.Save(fileName);
+                    var worksheet = workbook.Worksheets[0];
+                    var columns = worksheet.Cells.Columns.OfType<Column>();
+                    var rows = worksheet.Cells.Rows.OfType<Row>();
 
-                    // Closing the file stream to free all resources
+                    var lastRowIndex = rows.FirstOrDefault(x => x.FirstDataCell == null).Index;
+
+                    foreach (var languageResource in LanguageResources)
+                    {
+                        for (int i = 0; i < columns.Count(); i++)
+                        {
+                            var langColumn = rows.FirstOrDefault()[i];
+                            if (langColumn.StringValue == languageResource.ColumnExcelName)
+                            {
+                                languageResource.ColumnExcelIndex = i;
+                            }
+                        }
+                    }
+                    for (int i = 0; i < columns.Count(); i++)
+                    {
+                        var langColumn = rows.FirstOrDefault()[i];
+                        if (langColumn.StringValue == "Name")
+                        {
+                            NameExcelIndex = i;
+                        }
+                    }
+
+                    logRichText.AppendText(" : OK", "Green");
+                    xlsPathTextBox.Background = Brushes.LightGreen;
+                    IsXlsLoaded = true;
                 }
                 catch (FileNotFoundException)
                 {
                     logRichText.AppendText(" : NOT FOUND", "Red");
                     xlsPathTextBox.Background = Brushes.IndianRed;
                 }
-
-                logRichText.AppendText(" : OK", "Green");
-                xlsPathTextBox.Background = Brushes.LightGreen;
-                IsXlsLoaded = true;
+                catch (IOException)
+                {
+                    logRichText.AppendText(" : EXCEL Already opened in another application", "Red");
+                    xlsPathTextBox.Background = Brushes.IndianRed;
+                }
 
                 ConsoleNewLine();
-                //logRichText.Document.Blocks.Clear();
-                //logRichText.Document.Blocks.Add(new Paragraph(new Run(text)));
             }
         }
 
@@ -99,6 +118,13 @@ namespace Localizer
             }
             else
             {
+                var worksheet = workbook.Worksheets[0];
+                var columns = worksheet.Cells.Columns.OfType<Column>();
+                var rows = worksheet.Cells.Rows.OfType<Row>();
+
+                var lastRowIndex = rows.FirstOrDefault(x => x.FirstDataCell == null).Index;
+                worksheet.Cells[lastRowIndex, NameExcelIndex].PutValue(newKeyValue);
+
                 foreach (var languageResource in LanguageResources)
                 {
                     languageResource.ResourceParsedText.Add(newKeyValue, defaultValue);
@@ -106,28 +132,23 @@ namespace Localizer
                     File.WriteAllText(languageResource.FullPath, serializedObject);
 
 
+                    var cellValue = languageResource.ColumnExcelName == "English" ? defaultValue : "";
+                    worksheet.Cells[lastRowIndex, languageResource.ColumnExcelIndex].PutValue(cellValue);
+                    workbook.Save(xlsPathTextBox.Text);
+
 
                     logRichText.AppendText($"New key for {languageResource.FileName}", "Black");
                     logRichText.AppendText(" : OK", "Green");
-                    ConsoleNewLine();
                 }
 
+                ConsoleNewLine();
             }
         }
 
         private void LoadTranlsatesFromXLS_Click(object sender, RoutedEventArgs e)
         {
-            //var test = ExcelFileContent.AsDataSet();
-            //var mySheet = test.Tables[0];
-            //var mySheetHeader = mySheet.Rows[0];
-            //foreach (var languageResource in LanguageResources)
-            //{
-            //    DataRow workRow = mySheet.NewRow();
-            //    workRow[0] = "asdasdasdas1123";
-            //    workRow[4] = "xzcs2131231newKeyValuesdaasdasdasdas123";
-            //    mySheet.Rows.Add(workRow);
-            //    ExcelFileContent.Close();
-            //}
+
+
         }
 
         private void SelectFolder_Click(object sender, RoutedEventArgs e)
@@ -208,6 +229,7 @@ namespace Localizer
     {
         public string FileName { get; set; }
         public string ColumnExcelName { get; set; }
+        public int ColumnExcelIndex { get; set; }
         public string ResourceText { get; set; }
         public string FullPath { get; set; }
         public Dictionary<string, string> ResourceParsedText { get; set; }
