@@ -22,6 +22,7 @@
         <TextBox Name="newKeyNameTextBox" Margin="11,0,393,38" Text="New Key" TextWrapping="Wrap" VerticalAlignment="Bottom" BorderBrush="#FF8EA7F1" Height="21"/>
         <Button Content="Load Tranlsates from XLS" Width="142" Height="21" Click="LoadTranlsatesFromXLS_Click" Margin="0,0,156,38" HorizontalAlignment="Right" VerticalAlignment="Bottom" Background="#FFC4EFFF" Cursor="Hand"/>
         <TextBox Name="defaultNewKeyValue" Margin="11,0,393,12" Text="Default New Key Value" TextWrapping="Wrap" VerticalAlignment="Bottom" BorderBrush="#FF8EA7F1" Height="21"/>
+        <TextBlock Text="Dimas™" TextWrapping="Wrap" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="48" Margin="0,0,0,3"/>
 
     </Grid>
 </Window>

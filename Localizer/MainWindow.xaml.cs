@@ -34,6 +34,8 @@ namespace Localizer
 
         public MainWindow()
         {
+            Aspose.Cells.License license = new Aspose.Cells.License();
+            license.SetLicense("Aspose.Total.lic");
             System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
             InitializeComponent();
         }
@@ -102,9 +104,9 @@ namespace Localizer
 
         private void AddNewKey_Click(object sender, RoutedEventArgs e)
         {
-            var newKeyValue = newKeyNameTextBox.Text;
+            var newKeyName = newKeyNameTextBox.Text;
             var defaultValue = defaultNewKeyValue.Text;
-            if (string.IsNullOrWhiteSpace(newKeyValue))
+            if (string.IsNullOrWhiteSpace(newKeyName))
             {
                 _ = MessageBox.Show("Key Name cannot be empty.", "Warning", MessageBoxButton.OK);
             }
@@ -116,6 +118,10 @@ namespace Localizer
             {
                 _ = MessageBox.Show("Excel file or translate files was not loaded!", "Warning", MessageBoxButton.OK);
             }
+            else if (LanguageResources.FirstOrDefault().ResourceParsedText.ContainsKey(newKeyName))
+            {
+                _ = MessageBox.Show($"The Key {newKeyName} is already added!", "Warning", MessageBoxButton.OK);
+            }
             else
             {
                 var worksheet = workbook.Worksheets[0];
@@ -123,11 +129,11 @@ namespace Localizer
                 var rows = worksheet.Cells.Rows.OfType<Row>();
 
                 var lastRowIndex = rows.FirstOrDefault(x => x.FirstDataCell == null).Index;
-                worksheet.Cells[lastRowIndex, NameExcelIndex].PutValue(newKeyValue);
+                worksheet.Cells[lastRowIndex, NameExcelIndex].PutValue(newKeyName);
 
                 foreach (var languageResource in LanguageResources)
                 {
-                    languageResource.ResourceParsedText.Add(newKeyValue, defaultValue);
+                    languageResource.ResourceParsedText.Add(newKeyName, defaultValue);
                     var serializedObject = JsonConvert.SerializeObject(languageResource.ResourceParsedText, Formatting.Indented);
                     File.WriteAllText(languageResource.FullPath, serializedObject);
 
@@ -147,8 +153,11 @@ namespace Localizer
 
         private void LoadTranlsatesFromXLS_Click(object sender, RoutedEventArgs e)
         {
-
-
+            _ = MessageBox.Show($"The Function still not working!", "Warning", MessageBoxButton.OK);
+            return;
+            var worksheet = workbook.Worksheets[0];
+            var columns = worksheet.Cells.Columns.OfType<Column>();
+            var rows = worksheet.Cells.Rows.OfType<Row>();
         }
 
         private void SelectFolder_Click(object sender, RoutedEventArgs e)
