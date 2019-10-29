@@ -7,6 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Apsose.Total.lic" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Apsose.Total.lic" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Aspose.Cells" Version="19.10.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="4.6.0" />
