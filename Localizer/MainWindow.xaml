@@ -8,7 +8,7 @@
     <Grid>
 
         <Button Content="Select Folder" Width="85" Height="18" Click="SelectFolder_Click" Margin="0,0,9,87" Canvas.Left="699" Cursor="Hand" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
-        <TextBox Name="filePathTextBox" Margin="11,0,99,87" Text="File Path" TextWrapping="Wrap" VerticalAlignment="Bottom"/>
+        <TextBox Name="filePathTextBox" Margin="11,0,99,87" Text="File Path for resources" TextWrapping="Wrap" VerticalAlignment="Bottom"/>
         <RichTextBox Name="logRichText" Margin="10,10,10,110" VerticalScrollBarVisibility="Auto">
             <RichTextBox.Resources>
                 <Style TargetType="{x:Type Paragraph}">

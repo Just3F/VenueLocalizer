@@ -61,7 +61,16 @@ namespace Localizer
                     var columns = worksheet.Cells.Columns.OfType<Column>();
                     var rows = worksheet.Cells.Rows.OfType<Row>();
 
-                    var lastRowIndex = rows.FirstOrDefault(x => x.FirstDataCell == null).Index;
+                    var lastRow = rows.FirstOrDefault(x => x.FirstDataCell == null);
+                    int lastRowIndex;
+                    if (lastRow != null)
+                    {
+                        lastRowIndex = lastRow.Index;
+                    }
+                    else
+                    {
+                        lastRowIndex = rows.Last().Index;
+                    }
 
                     foreach (var languageResource in LanguageResources)
                     {
@@ -128,8 +137,20 @@ namespace Localizer
                 var columns = worksheet.Cells.Columns.OfType<Column>();
                 var rows = worksheet.Cells.Rows.OfType<Row>();
 
-                var lastRowIndex = rows.FirstOrDefault(x => x.FirstDataCell == null).Index;
+                var lastRow = rows.FirstOrDefault(x => x.FirstDataCell == null);
+                int lastRowIndex;
+                if (lastRow != null)
+                {
+                    lastRowIndex = lastRow.Index;
+                }
+                else
+                {
+                    lastRowIndex = rows.Last().Index;
+                }
+
                 worksheet.Cells[lastRowIndex, NameExcelIndex].PutValue(newKeyName);
+                logRichText.AppendText($"New key for EXCEL", "Black");
+                logRichText.AppendText(" : OK" + Environment.NewLine, "Green");
 
                 foreach (var languageResource in LanguageResources)
                 {
@@ -144,7 +165,8 @@ namespace Localizer
 
 
                     logRichText.AppendText($"New key for {languageResource.FileName}", "Black");
-                    logRichText.AppendText(" : OK", "Green");
+                    logRichText.AppendText(" : OK" + Environment.NewLine, "Green");
+
                 }
 
                 ConsoleNewLine();
